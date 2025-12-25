@@ -346,9 +346,14 @@ leaderRow: {
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '15px',
-  backgroundColor: '#f8f9fa',
+  backgroundColor: '#ffffff', // Explicitly white background
   borderRadius: '12px',
   border: '1px solid #eee',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+  marginBottom: '10px',
+  
+  /* --- iOS Color Fixes --- */
+  color: '#333333',            // Force text to be dark grey/black
+  WebkitAppearance: 'none',    // Removes iOS button/div defaults
+  appearance: 'none',
 }
 };
