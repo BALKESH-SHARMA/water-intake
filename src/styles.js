@@ -198,5 +198,146 @@ dateBtn: {
   alignItems: 'center',
   justifyContent: 'center',
   transition: 'transform 0.1s active'
+},
+// drawer styles
+menuBtn: {
+  position: 'fixed',
+  top: '20px',
+  left: '20px',
+  fontSize: '24px',
+  background: 'none',
+  border: 'none',
+  color: '#0D47A1',
+  cursor: 'pointer',
+  zIndex: 10
+},
+drawerOverlay: {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  zIndex: 100,
+  display: 'flex'
+},
+drawerContent: {
+  width: '280px',
+  height: '100%',
+  backgroundColor: '#fff',
+  padding: '30px 20px',
+  boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
+  animation: 'slideIn 0.3s ease-out'
+},
+drawerHeader: {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginBottom: '30px',
+  borderBottom: '1px solid #eee',
+  paddingBottom: '10px'
+},
+closeBtn: {
+  background: 'none',
+  border: 'none',
+  fontSize: '20px',
+  color: '#999',
+  cursor: 'pointer'
+},
+drawerSection: {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px'
+},
+drawerLabel: {
+  fontSize: '14px',
+  color: '#666',
+  fontWeight: '600'
+},
+drawerInput: {
+  padding: '12px',
+  fontSize: '18px',
+  borderRadius: '8px',
+  border: '1px solid #ddd',
+  textAlign: 'center'
+},
+drawerItem: {
+  width: '100%',
+  padding: '15px',
+  textAlign: 'left',
+  backgroundColor: '#f0f7ff', // Explicitly set background
+  color: '#0D47A1',           // Explicitly set text color
+  border: 'none',
+  borderRadius: '12px',
+  fontSize: '16px',
+  fontWeight: '600',
+  cursor: 'pointer',
+  marginBottom: '10px',
+  display: 'flex',
+  alignItems: 'center',
+  
+  /* --- iOS SPECIFIC FIXES --- */
+  WebkitAppearance: 'none',   // Removes default iOS button styling
+  appearance: 'none',         // Standard property to remove styling
+  WebkitTapHighlightColor: 'transparent', // Removes the grey box when tapping
+  },
+navBar: {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '60px', // Header height
+  backgroundColor: '#fff',
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '0 15px',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+  boxSizing: 'border-box'
+},
+scrollContent: {
+  flex: 1,
+  paddingTop: '80px', // THIS IS THE FIX: 80px is more than 60px navBar
+  paddingBottom: '120px', 
+  width: '100%',
+  maxWidth: '500px',
+  margin: '0 auto',
+  boxSizing: 'border-box',
+  overflowY: 'auto'
+},
+navSpacer: {
+  height: '80px', // Increased this to give more room below the navBar
+  width: '100%'
+},
+navTitle: {
+  fontSize: '18px',
+  color: '#0D47A1',
+  fontWeight: 'bold',
+  margin: 0,
+  flex: 1,            // Helps center the title
+  textAlign: 'center'
+},
+menuBtn: {
+  fontSize: '28px',    // Larger for easier tapping
+  background: 'none',
+  border: 'none',
+  color: '#0D47A1',
+  cursor: 'pointer',
+  padding: '10px',     // Bigger tap target area
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 600,         // Higher than the navBar background
+  pointerEvents: 'auto' // Ensures it captures the click
+},
+// Ensure your container doesn't have its own fixed top padding that clashes
+container: {
+  padding: '0 20px 120px 20px', // Ensure 0 top padding here
+  fontFamily: '-apple-system, sans-serif',
+  width: '100%',
+  maxWidth: '500px',
+  display: 'flex',
+  flexDirection: 'column'
 }
 };

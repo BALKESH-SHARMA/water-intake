@@ -5,17 +5,29 @@ import Setup from './components/Setup';
 import History from './components/History'; // Import the new component
 import ManualInput from './components/ManualInput';
 import { styles } from './styles';
-
+import Navigation from './components/Navigation';
 function App() {
   const [familyData, setFamilyData] = useState([]);
   const [userName, setUserName] = useState(localStorage.getItem('water_name') || '');
-  const [myGoal, setMyGoal] = useState(parseInt(localStorage.getItem('water_goal')) || 2000);
+  const [myGoal, setMyGoal] = useState(() => {
+    const saved = localStorage.getItem('water_goal');
+    return saved ? Math.max(parseInt(saved), 2000) : 2000;
+  });
   const [showManual, setShowManual] = useState(false);
   const [expandedMember, setExpandedMember] = useState(null);
-  
+
+  const getISTDate = () => {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  };
+  const today = getISTDate();
   // Track which date we are looking at
-  const [viewDate, setViewDate] = useState(new Date().toISOString().split('T')[0]);
-  const today = new Date().toISOString().split('T')[0];
+  const [viewDate, setViewDate] = useState(today);
+  // const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     const dayRef = ref(db, `days/${viewDate}`);
@@ -27,19 +39,31 @@ function App() {
 
   const addWater = (amount) => {
     if (!userName || isNaN(amount) || amount <= 0) return;
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const time = new Date().toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
     const userKey = userName.toLowerCase().trim();
-    
+
     // We always log to TODAY, even if viewing history
     const updates = {};
     updates[`days/${today}/${userKey}/name`] = userName;
     updates[`days/${today}/${userKey}/total`] = increment(amount);
     updates[`days/${today}/${userKey}/goal`] = myGoal;
     updates[`days/${today}/${userKey}/logs/${Date.now()}`] = { amount, time };
-    
+
     update(ref(db), updates);
     setShowManual(false);
     setViewDate(today); // Jump back to today to see the update
+  };
+
+  const handleGoalUpdate = (newVal) => {
+    setMyGoal(newVal);
+    localStorage.setItem('water_goal', newVal);
+    update(ref(db, `days/${today}/${userName.toLowerCase()}`), { goal: newVal });
   };
 
   const deleteLog = (memberId, logId, amount) => {
@@ -53,24 +77,33 @@ function App() {
 
   return (
     <div style={styles.pageWrapper}>
+
+      <Navigation
+        myGoal={myGoal}
+        onGoalUpdate={handleGoalUpdate}
+        styles={styles}
+      />
       <div style={styles.container}>
-        <History 
-          viewDate={viewDate}
-          onDateChange={setViewDate}
-          familyData={familyData}
-          expandedMember={expandedMember}
-          setExpandedMember={setExpandedMember}
-          onLogDelete={deleteLog}
-          currentUserId={userName.toLowerCase()}
-          styles={styles}
-        />
+        <main style={styles.scrollContent}>
+          {/* CRITICAL: This spacer prevents the overlap */}
+          <History
+            viewDate={viewDate}
+            onDateChange={setViewDate}
+            familyData={familyData}
+            expandedMember={expandedMember}
+            setExpandedMember={setExpandedMember}
+            onLogDelete={deleteLog}
+            currentUserId={userName.toLowerCase()}
+            styles={styles}
+          />
+        </main>
 
         {/* Buttons are only useful if viewing TODAY */}
         {viewDate === today && (
           <div style={styles.fabContainer}>
             <button onClick={() => addWater(250)} style={styles.fab}>+250</button>
             <button onClick={() => addWater(500)} style={styles.fab}>+500</button>
-            <button onClick={() => setShowManual(true)} style={{...styles.fab, backgroundColor: '#FF9800'}}>Custom</button>
+            <button onClick={() => setShowManual(true)} style={{ ...styles.fab, backgroundColor: '#FF9800' }}>Custom</button>
           </div>
         )}
 
