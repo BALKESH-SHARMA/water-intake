@@ -6,6 +6,14 @@ import History from './components/History'; // Import the new component
 import ManualInput from './components/ManualInput';
 import { styles } from './styles';
 import Navigation from './components/Navigation';
+const getISTDate = () => {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  };
 function App() {
   const [familyData, setFamilyData] = useState([]);
   const [userName, setUserName] = useState(localStorage.getItem('water_name') || '');
@@ -16,14 +24,7 @@ function App() {
   const [showManual, setShowManual] = useState(false);
   const [expandedMember, setExpandedMember] = useState(null);
 
-  const getISTDate = () => {
-    return new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(new Date());
-  };
+  
   const today = getISTDate();
   // Track which date we are looking at
   const [viewDate, setViewDate] = useState(today);
@@ -81,6 +82,7 @@ function App() {
       <Navigation
         myGoal={myGoal}
         onGoalUpdate={handleGoalUpdate}
+        familyData={familyData}
         styles={styles}
       />
       <div style={styles.container}>

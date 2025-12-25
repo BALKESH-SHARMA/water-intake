@@ -339,5 +339,16 @@ container: {
   maxWidth: '500px',
   display: 'flex',
   flexDirection: 'column'
+},
+// Leaderboard styles
+leaderRow: {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '15px',
+  backgroundColor: '#f8f9fa',
+  borderRadius: '12px',
+  border: '1px solid #eee',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
 }
 };

@@ -11,29 +11,43 @@ export default function History({
   currentUserId, 
   styles 
 }) {
-  const today = new Date().toISOString().split('T')[0];
+  // Use the same IST logic here to match App.jsx
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
 
   const handlePrev = () => {
     const d = new Date(viewDate);
     d.setDate(d.getDate() - 1);
-    onDateChange(d.toISOString().split('T')[0]);
+    // Manual format to YYYY-MM-DD to keep en-CA style
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    onDateChange(`${year}-${month}-${day}`);
   };
 
   const handleNext = () => {
     if (viewDate === today) return;
     const d = new Date(viewDate);
     d.setDate(d.getDate() + 1);
-    onDateChange(d.toISOString().split('T')[0]);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    onDateChange(`${year}-${month}-${day}`);
   };
 
   return (
     <div style={{ width: '100%' }}>
+      {/* Keeping the header here as requested */}
       <header style={styles.header}>
         <button onClick={handlePrev} style={styles.dateBtn}>◀</button>
         <div style={{ textAlign: 'center' }}>
           <h1 style={styles.title}>Family History</h1>
           <span style={styles.dateBadge}>
-            {viewDate === today ? "Today" : viewDate}
+            {viewDate.trim() === today.trim() ? "Today" : viewDate}
           </span>
         </div>
         <button 
