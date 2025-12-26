@@ -82,8 +82,13 @@ export default function Setup({ onJoin, styles }) {
             placeholder="Your Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={20}
             required
           />
+          {/* Optional: Visual counter */}
+<div style={{ fontSize: '10px', color: '#999', textAlign: 'right', marginTop: '4px' }}>
+  {name.length}/20
+</div>
           
           <button type="submit" style={{
             width: '100%',

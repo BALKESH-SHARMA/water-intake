@@ -7,6 +7,9 @@ import ManualInput from './components/ManualInput';
 import { styles } from './styles';
 import Navigation from './components/Navigation';
 import AvatarModal from './components/AvatarModal';
+import Reminder from './components/Reminder';
+import ActionButtons from './components/ActionButtons';
+import PersonalDashboard from './components/PersonalDashboard';
 const getISTDate = () => {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Kolkata',
@@ -56,54 +59,54 @@ function App() {
   }, [viewDate]); // Re-fetch when date changes
 
   useEffect(() => {
-  if (!userName || familyData.length === 0) return;
+    if (!userName || familyData.length === 0) return;
 
-  const userKey = userName.toLowerCase().trim();
-  const myData = familyData.find(m => m.id === userKey);
-  
-  // MOVE THIS UP so it's available everywhere in this effect
-  const hour = new Date().getHours();
-  const isDaytime = hour >= 8 && hour <= 22;
+    const userKey = userName.toLowerCase().trim();
+    const myData = familyData.find(m => m.id === userKey);
 
-  if (myData && myData.logs) {
-    const logTimestamps = Object.keys(myData.logs).map(Number);
-    const lastLogTime = Math.max(...logTimestamps);
+    // MOVE THIS UP so it's available everywhere in this effect
+    const hour = new Date().getHours();
+    const isDaytime = hour >= 8 && hour <= 22;
 
-    const threeHours = 3 * 60 * 60 * 1000; // Reset to 3 hours
-    const timeSinceLastLog = Date.now() - lastLogTime;
+    if (myData && myData.logs) {
+      const logTimestamps = Object.keys(myData.logs).map(Number);
+      const lastLogTime = Math.max(...logTimestamps);
 
-    if (timeSinceLastLog > threeHours && isDaytime && myData.total < myData.goal) {
+      const threeHours = 3 * 60 * 60 * 1000; // Reset to 3 hours
+      const timeSinceLastLog = Date.now() - lastLogTime;
+
+      if (timeSinceLastLog > threeHours && isDaytime && myData.total < myData.goal) {
+        setShowReminder(true);
+      } else {
+        setShowReminder(false);
+      }
+    } else if (isDaytime) {
+      // This now works because isDaytime is defined above
       setShowReminder(true);
-    } else {
-      setShowReminder(false);
     }
-  } else if (isDaytime) {
-    // This now works because isDaytime is defined above
-    setShowReminder(true);
-  }
-}, [familyData, userName]);
+  }, [familyData, userName]);
 
   const calculateStreak = (userKey) => {
-  return new Promise((resolve) => {
-    const yesterday = getYesterdayIST();
-    const yesterdayRef = ref(db, `days/${yesterday}/${userKey}`);
-    
-    // Safety: If Firebase takes too long or doesn't find the user, return 0
-    const timeout = setTimeout(() => resolve(0), 1500);
+    return new Promise((resolve) => {
+      const yesterday = getYesterdayIST();
+      const yesterdayRef = ref(db, `days/${yesterday}/${userKey}`);
 
-    onValue(yesterdayRef, (snapshot) => {
-      clearTimeout(timeout);
-      const data = snapshot.val();
-      
-      // Check if data exists AND the user met their goal yesterday
-      if (data && data.total >= (data.goal || 2000)) {
-        resolve(data.streak || 0);
-      } else {
-        resolve(0);
-      }
-    }, { onlyOnce: true });
-  });
-};
+      // Safety: If Firebase takes too long or doesn't find the user, return 0
+      const timeout = setTimeout(() => resolve(0), 1500);
+
+      onValue(yesterdayRef, (snapshot) => {
+        clearTimeout(timeout);
+        const data = snapshot.val();
+
+        // Check if data exists AND the user met their goal yesterday
+        if (data && data.total >= (data.goal || 2000)) {
+          resolve(data.streak || 0);
+        } else {
+          resolve(0);
+        }
+      }, { onlyOnce: true });
+    });
+  };
 
   const addWater = async (amount) => {
     if (!userName || isNaN(amount) || amount <= 0) return;
@@ -199,43 +202,12 @@ function App() {
 
   return (
     <div style={styles.pageWrapper}>
-      {showReminder && (
-  <div style={{
-    position: 'fixed',      // Fixes it to the top of the viewport
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFF9C4',
-    color: '#F57F17',
-    padding: '12px 20px',
-    textAlign: 'center',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    borderBottom: '1px solid #FBC02D',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '10px',
-    zIndex: 3000,           // Higher than Nav and Modals
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    animation: 'slideDown 0.4s ease-out' // Use the slideDown animation
-  }}>
-    <span>🕒 Time to hydrate, {userName}! It's been a while.</span>
-    <button 
-      onClick={() => setShowReminder(false)}
-      style={{ 
-        background: 'none', 
-        border: 'none', 
-        fontSize: '18px', 
-        cursor: 'pointer',
-        color: '#F57F17',
-        marginLeft: '10px'
-      }}
-    >
-      ✕
-    </button>
-  </div>
-)}
+      {/* 1. Logic-based Reminder Banner */}
+      <Reminder
+        userName={userName}
+        show={showReminder}
+        onDismiss={() => setShowReminder(false)}
+      />
       <Navigation
         onOpenAvatar={() => setShowAvatarModal(true)}
         myGoal={myGoal}
@@ -254,6 +226,13 @@ function App() {
       <div style={styles.container}>
         <main style={styles.scrollContent}>
           {/* CRITICAL: This spacer prevents the overlap */}
+          {viewDate === today && (
+    <PersonalDashboard 
+      userName={userName} 
+      db={db} 
+      styles={styles} 
+    />
+  )}
           {loading ? (
             <div style={styles.loadingOverlay}>
               <div style={styles.spinner}></div>
@@ -277,11 +256,11 @@ function App() {
 
         {/* Buttons are only useful if viewing TODAY */}
         {viewDate === today && (
-          <div style={styles.fabContainer}>
-            <button onClick={() => addWater(250)} style={styles.fab}>+250</button>
-            <button onClick={() => addWater(500)} style={styles.fab}>+500</button>
-            <button onClick={() => setShowManual(true)} style={{ ...styles.fab, backgroundColor: '#FF9800' }}>Custom</button>
-          </div>
+          <ActionButtons 
+          onAdd={addWater} 
+          onShowManual={() => setShowManual(true)} 
+          styles={styles} 
+        />
         )}
 
         {showManual && <ManualInput onAdd={addWater} onClose={() => setShowManual(false)} styles={styles} />}
