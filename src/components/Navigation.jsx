@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import GoalModal from './GoalModal';
 import Leaderboard from './Leaderboard';
 
-export default function Navigation({ myGoal, onGoalUpdate, familyData, styles }) {
+export default function Navigation({ myGoal, onGoalUpdate, onOpenAvatar, familyData, styles }) {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const avatars = ['💧', '🥤', '🌊', '🐳', '🐧', '🌵', '❄️', '🥥', '🍉', '🍋'];
 
   return (
     <>
@@ -24,16 +25,25 @@ export default function Navigation({ myGoal, onGoalUpdate, familyData, styles })
               <h3 style={{ margin: 0 }}>Menu</h3>
               <button onClick={() => setShowDrawer(false)} style={styles.closeBtn}>✕</button>
             </div>
-            
-            <button 
-              style={styles.drawerItem} 
+            <button
+              style={styles.drawerItem}
+              onClick={() => {
+                onOpenAvatar(); // Trigger the modal
+                setShowDrawer(false); // Close the side menu
+              }}
+            >
+              🎭 Change Avatar
+            </button>
+
+            <button
+              style={styles.drawerItem}
               onClick={() => { setShowLeaderboard(true); setShowDrawer(false); }}
             >
               🏆 Leaderboard
             </button>
 
-            <button 
-              style={styles.drawerItem} 
+            <button
+              style={styles.drawerItem}
               onClick={() => { setShowGoalModal(true); setShowDrawer(false); }}
             >
               🎯 Set Daily Goal
@@ -42,11 +52,11 @@ export default function Navigation({ myGoal, onGoalUpdate, familyData, styles })
         </div>
       )}
 
-      <Leaderboard 
-        isOpen={showLeaderboard} 
-        onClose={() => setShowLeaderboard(false)} 
-        familyData={familyData} 
-        styles={styles} 
+      <Leaderboard
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+        familyData={familyData}
+        styles={styles}
       />
 
       <GoalModal

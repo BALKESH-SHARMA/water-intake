@@ -127,7 +127,8 @@ export const styles = {
     boxSizing: 'border-box', 
     backgroundColor: 'rgba(240,248,255,0.95)', 
     backdropFilter: 'blur(10px)',
-    borderTop: '1px solid rgba(0,0,0,0.05)'
+    borderTop: '1px solid rgba(0,0,0,0.05)',
+    zIndex: 100
   },
   fab: { 
     flex: 1, 
@@ -152,7 +153,7 @@ export const styles = {
     display: 'flex', 
     justifyContent: 'center', 
     alignItems: 'center', 
-    zIndex: 1000,
+    zIndex: 2000,
     backdropFilter: 'blur(4px)'
   },
   input: { 
@@ -355,5 +356,30 @@ leaderRow: {
   color: '#333333',            // Force text to be dark grey/black
   WebkitAppearance: 'none',    // Removes iOS button/div defaults
   appearance: 'none',
-}
+},
+//loading spinner
+loadingOverlay: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '60vh',
+    width: '100%',
+  },
+  spinner: {
+    width: '40px',
+    height: '40px',
+    border: '4px solid #f3f3f3',
+    borderTop: '4px solid #0D47A1',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  }
 };
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+document.head.appendChild(styleSheet);
